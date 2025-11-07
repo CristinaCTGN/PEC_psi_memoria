@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Evaluador A / S</title>
+<style>
+body { font-family:sans-serif; margin:40px; }
+textarea { width:100%; height:200px; font-size:18px; }
+button, select { margin-top:15px; padding:10px 16px; font-size:20px; cursor:pointer; }
+#resultado { margin-top:30px; font-size:22px; }
+</style>
+</head>
+<body>
+
+<h1>Evaluación de recuerdo</h1>
+
+<p>Selecciona la lista utilizada:</p>
+<select id="selectorLista">
+  <option value="1">Lista 1</option>
+  <option value="2">Lista 2</option>
+</select>
+
+<p>Escribe las palabras recordadas (una por línea):</p>
+<textarea id="entrada"></textarea>
+
+<button onclick="evaluar()">Evaluar</button>
+
+<div id="resultado"></div>
+
+<script>
+const lista1 = [
+"A - MONTAÑA","A - RÍO","S - LUNA","S - FLOR","A - CAMINO","S - VIENTO","A - CASA","A - SILENCIO",
+"S - ARENA","A - ÁRBOL","S - CIELO","A - TORMENTA","S - LUZ","A - PÁJARO","S - FUEGO","S - SONRISA",
+"A - MAR","A - SOMBRA","S - PUERTA","A - LLUVIA","S - ESTRELLA","A - NIEVE","S - CAMPO","A - MIRADA",
+"S - LADO","S - PASO","A - VIDRIO","S - CANTO","S - TIERRA","A - NUBE"
+];
+
+const lista2 = [
+"S - MONTAÑA","S - RÍO","A - LUNA","A - FLOR","S - CAMINO","A - VIENTO","S - CASA","S - SILENCIO",
+"A - ARENA","S - ÁRBOL","A - CIELO","S - TORMENTA","A - LUZ","S - PÁJARO","A - FUEGO","A - SONRISA",
+"S - MAR","S - SOMBRA","A - PUERTA","S - LLUVIA","A - ESTRELLA","S - NIEVE","A - CAMPO","S - MIRADA",
+"A - LADO","A - PASO","S - VIDRIO","A - CANTO","A - TIERRA","S - NUBE"
+];
+
+function extraer(tipo, lista) {
+  return lista
+    .filter(x => x.startsWith(tipo + " -"))
+    .map(x => x.split(" - ")[1].trim().toLowerCase());
+}
+
+function evaluar() {
+  const seleccion = document.getElementById("selectorLista").value;
+  const listaElegida = (seleccion === "1") ? lista1 : lista2;
+
+  const palabrasA = new Set(extraer("A", listaElegida));
+  const palabrasS = new Set(extraer("S", listaElegida));
+
+  const escritas = document.getElementById("entrada").value
+    .toLowerCase()
+    .split(/\n+/)
+    .map(x => x.trim())
+    .filter(x => x);
+
+  const recordadasA = escritas.filter(w => palabrasA.has(w)).length;
+  const recordadasS = escritas.filter(w => palabrasS.has(w)).length;
+
+  const porcentajeA = ((recordadasA / palabrasA.size) * 100).toFixed(1);
+  const porcentajeS = ((recordadasS / palabrasS.size) * 100).toFixed(1);
+
+  document.getElementById("resultado").innerHTML = `
+    ✅ <b>Porcentaje recordado A:</b> ${porcentajeA}%<br>
+    ✅ <b>Porcentaje recordado S:</b> ${porcentajeS}%
+  `;
+}
+</script>
+
+</body>
+</html>

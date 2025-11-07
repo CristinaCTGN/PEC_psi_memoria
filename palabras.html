@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Evaluación de Palabras</title>
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  margin: 0; padding: 0;
+  background: #fafafa;
+}
+#pantalla {
+  font-size: 60px;
+  margin-top: 150px;
+}
+select, button {
+  font-size: 22px;
+  margin: 15px;
+  padding: 8px 14px;
+}
+#controles { display: none; }
+</style>
+</head>
+<body>
+
+<h1>Evaluación de palabras</h1>
+
+<div id="inicio">
+  <p>Selecciona una lista para comenzar:</p>
+  <button onclick="iniciar(1)">Lista 1</button>
+  <button onclick="iniciar(2)">Lista 2</button>
+</div>
+
+<div id="pantalla"></div>
+
+<div id="controles">
+  <div>
+    Número de sílabas:
+    <select id="silabas">
+      <option value="">-</option>
+      <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+    </select>
+  </div>
+
+  <div>
+    Emoción:
+    <select id="emocion">
+      <option value="">-</option>
+      <option>Agradable</option>
+      <option>Desagradable</option>
+    </select>
+  </div>
+</div>
+
+<script>
+const lista1 = [
+"A - MONTAÑA","A - RÍO","S - LUNA","S - FLOR","A - CAMINO","S - VIENTO","A - CASA","A - SILENCIO",
+"S - ARENA","A - ÁRBOL","S - CIELO","A - TORMENTA","S - LUZ","A - PÁJARO","S - FUEGO","S - SONRISA",
+"A - MAR","A - SOMBRA","S - PUERTA","A - LLUVIA","S - ESTRELLA","A - NIEVE","S - CAMPO","A - MIRADA",
+"S - LADO","S - PASO","A - VIDRIO","S - CANTO","S - TIERRA","A - NUBE"
+];
+
+const lista2 = [
+"S - MONTAÑA","S - RÍO","A - LUNA","A - FLOR","S - CAMINO","A - VIENTO","S - CASA","S - SILENCIO",
+"A - ARENA","S - ÁRBOL","A - CIELO","S - TORMENTA","A - LUZ","S - PÁJARO","A - FUEGO","A - SONRISA",
+"S - MAR","S - SOMBRA","A - PUERTA","S - LLUVIA","A - ESTRELLA","S - NIEVE","A - CAMPO","S - MIRADA",
+"A - LADO","A - PASO","S - VIDRIO","A - CANTO","A - TIERRA","S - NUBE"
+];
+
+let palabras = [];
+let indice = 0;
+let resultados = [];
+
+function iniciar(n) {
+  palabras = (n === 1 ? lista1 : lista2).slice();
+  indice = 0;
+  resultados = [];
+  document.getElementById("inicio").style.display = "none";
+  mostrarPalabra();
+}
+
+function mostrarPalabra() {
+  if (indice >= palabras.length) return finalizar();
+
+  const pantalla = document.getElementById("pantalla");
+  const controles = document.getElementById("controles");
+
+  // Mostrar palabra
+  pantalla.textContent = palabras[indice];
+  controles.style.display = "none";
+
+  // Después de 1 segundo → ocultar palabra y mostrar selectores
+  setTimeout(() => {
+    pantalla.textContent = "";
+    controles.style.display = "block";
+  }, 1000);
+}
+
+document.getElementById("controles").addEventListener("change", () => {
+  const s = document.getElementById("silabas").value;
+  const e = document.getElementById("emocion").value;
+
+  // Si marcó sílabas
+  if (s) {
+    resultados.push({ palabra: palabras[indice], silabas: s, emocion: null });
+    document.getElementById("silabas").value = "";
+  }
+
+  // Si marcó emoción
+  if (e) {
+    resultados.push({ palabra: palabras[indice], silabas: null, emocion: e });
+    document.getElementById("emocion").value = "";
+  }
+
+  indice++;
+  mostrarPalabra();
+});
+
+function finalizar() {
+  document.getElementById("pantalla").textContent = "✅ ¡Has terminado!";
+  document.getElementById("controles").style.display = "none";
+
+  // Mostrar solo botón de descarga
+  const botonDescarga = document.createElement("button");
+  botonDescarga.textContent = "Descargar resultados";
+  botonDescarga.style.fontSize = "24px";
+  botonDescarga.style.padding = "10px 20px";
+  botonDescarga.style.marginTop = "40px";
+  botonDescarga.onclick = descargarCSV;
+
+  document.body.appendChild(botonDescarga);
+}
+
+
+// Descargar CSV
+function descargarCSV() {
+  let filas = [["N","Letra","Palabra","Silabas","Emocion"]];
+
+  resultados.forEach((r, i) => {
+    const [letra, palabra] = r.palabra.split(" - ");
+    filas.push([ i+1, letra, palabra, r.silabas ?? "", r.emocion ?? "" ]);
+  });
+
+  let csv = filas.map(f => f.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "resultado_palabras.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+</script>
+
+</body>
+</html>

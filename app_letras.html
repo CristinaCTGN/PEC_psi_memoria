@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Test de Atención</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+/* Encabezado fijo */
+#header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 10px 0;
+    border-bottom: 2px solid black;
+    z-index: 100;
+}
+
+#instruccion {
+    font-size: 20px;
+}
+
+#temporizador {
+    font-size: 20px;
+    margin-top: 6px;
+}
+
+#btnEmpezar {
+    font-size: 20px;
+    padding: 6px 14px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+/* Ejemplo */
+#ejemplo {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* Cuadrícula real */
+#contenedor {
+    margin-top: 25px;
+    display: none;
+}
+
+/* Cada fila */
+.fila {
+    display: flex;
+    justify-content: center;
+}
+
+/* Cada letra */
+.letra {
+    border: 1px solid #000;
+    padding: 4px 8px;
+    font-size: 22px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Letra marcada */
+.letra.marcada {
+    background: yellow;
+}
+
+/* Marcador final */
+#resultado {
+    margin-top: 30px;
+    font-size: 22px;
+    display: none;
+}
+#resultado div { margin: 8px 0; }
+</style>
+</head>
+
+<body>
+
+<div id="header">
+    <div id="instruccion">
+        Debes <b>marcar</b> únicamente las letras “c” que vayan <b>precedidas de “a”</b>, o <b>seguidas de “e”</b>.
+    </div>
+    <div id="temporizador">Pulsa "Empezar" para iniciar</div>
+    <button id="btnEmpezar">Empezar</button>
+</div>
+
+<!-- Ejemplo visual -->
+<div id="ejemplo">
+    <div>→ La c se marca ✅ (precedida de "a")</div>
+    a <span class="letra" style="background:black;color:white;">c</span> b
+
+    <div>→ La c se marca ✅ (seguida de "e")</div>
+    b <span class="letra" style="background:black;color:white;">c</span> e
+
+    <div>→ La c se marca ✅ (ambas condiciones)</div>
+    a <span class="letra" style="background:black;color:white;">c</span> e
+
+    <div>→ La c NO se marca ❌</div>
+    b c d
+</div>
+
+<!-- Aquí aparecen las letras -->
+<div id="contenedor"></div>
+
+<!-- Resultado final -->
+<div id="resultado"></div>
+
+<script>
+let activo = false;
+let tiempo = 180;
+let intervalo = null;
+
+const contenedor = document.getElementById("contenedor");
+const temporizador = document.getElementById("temporizador");
+const resultado = document.getElementById("resultado");
+
+// Secuencia EXACTA proporcionada
+const texto = `REEMPLAZAR_AQUÍ`;
+
+/* 🔥 IMPORTANTE: para que esto funcione, pegaré automáticamente el texto que me diste */
+const secuencia = `
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+e e c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d
+a b e d c b a d e e c b a d c e d b a b c d e b a c d e c a b a c d e c e a b d
+b c d e b a c d e c a b a c d e c e a b d a b e d c b a d e e c b a d c e d b a
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d e
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+b c d e b a c d e c a b e d c b a d e e a b c d e b a c d e c a b e d c b a d e
+d c e d b a b a c d e c e a b d a a b c d e b a c d e c a b e d c b a d e b e d
+a d e b c b a d e e c b a d c e d b a b c d e b a c d e c a b a c d e c e a b d
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+e e c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d
+a b e d c b a d e e c b a d c e d b a b c d e b a c d e c a b a c d e c e a b d
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d e
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+a b e d c b a d e e c b a d c e d b a b c d e b a c d e c a b a c d e c e a b d
+b c d e b a c d e c a b a c d e c e a b d a b e d c b a d e e c b a d c e d b a
+b c d e b a c d e c a b e d c b a d e e a b c d e b a c d e c a b e d c b a d e
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+e e c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d
+a b e d c b a d e e c b a d c e d b a b c d e b a c d e c a b a c d e c e a b d
+b c d e b a c d e c a b a c d e c e a b d a b e d c b a d e e c b a d c e d b a
+a b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+b c d e b a c d e c a b e d c b a d e e c b a d c e d b a b a c d e c e a b d e
+c b a d c e d b a b a c d e c e a b d a b c d e b a c d e c a b e d c b a d e e
+`.trim();
+
+// Crear filas respetando saltos
+secuencia.split("\n").forEach(linea => {
+    const fila = document.createElement("div");
+    fila.className = "fila";
+    linea.trim().split(/\s+/).forEach(l => {
+        const span = document.createElement("span");
+        span.textContent = l;
+        span.className = "letra";
+        span.onclick = () => { if (activo) span.classList.toggle("marcada"); };
+        fila.appendChild(span);
+    });
+    contenedor.appendChild(fila);
+});
+
+// Evaluación final
+function evaluar() {
+    let correct = 0, wrongC = 0, ignored = 0, wrongOther = 0;
+    const filas = [...document.querySelectorAll(".fila")];
+
+    filas.forEach(fila => {
+        const letras = [...fila.children];
+        letras.forEach((el, i) => {
+            const letra = el.textContent;
+            const marcada = el.classList.contains("marcada");
+
+            if (letra === "c") {
+                let prev = letras[i - 1]?.textContent;
+                let next = letras[i + 1]?.textContent;
+                let debeMarcarse = (prev === "a") || (next === "e");
+
+                if (marcada && debeMarcarse) correct++;
+                else if (marcada && !debeMarcarse) wrongC++;
+                else if (!marcada && debeMarcarse) ignored++;
+
+            } else if (marcada) wrongOther++;
+        });
+    });
+
+    resultado.innerHTML = `
+        <div><b>Letras C marcadas correctamente:</b> ${correct}</div>
+        <div><b>Letras C marcadas erróneamente:</b> ${wrongC}</div>
+        <div><b>Letras C ignoradas:</b> ${ignored}</div>
+        <div><b>Otras letras marcadas erróneamente:</b> ${wrongOther}</div>
+	<div>Si has sobrevivido a esto, <b>puedes sobrevivir a cualquier reunión larga.</b></div>
+	<div>Tu cerebro ahora es <b>un poquito más poderoso.</b></div>
+	<div><b>¡Gracias por participar!</b></div>
+
+    `;
+    resultado.style.display = "block";
+}
+
+function tick() {
+    tiempo--;
+    let m = Math.floor(tiempo / 60);
+    let s = String(tiempo % 60).padStart(2,"0");
+    temporizador.textContent = `Tiempo: ${m}:${s}`;
+    if (tiempo <= 0) {
+        clearInterval(intervalo);
+        activo = false;
+        temporizador.textContent = "Tiempo finalizado";
+        evaluar();
+    }
+}
+
+document.getElementById("btnEmpezar").onclick = function() {
+    this.disabled = true;
+    document.getElementById("ejemplo").style.display = "none";
+    contenedor.style.display = "block";
+    activo = true;
+    intervalo = setInterval(tick, 1000);
+};
+</script>
+
+</body>
+</html>
