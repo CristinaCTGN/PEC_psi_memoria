@@ -68,16 +68,53 @@ const lista2 = [
 "A - LADO","A - PASO","S - VIDRIO","A - CANTO","A - TIERRA","S - NUBE"
 ];
 
+const instrucciones1 = ["A continuación, se mostrarán una serie de palabras sobre \
+las que debe realizar 2 tipos de juicios discriminativos. Si antes de la aparición de \
+la palabra aparece la letra “S”, debe decidir lo más rápidamente posible cuántas sílabas \
+tiene la palabra que se le muestra. Si por el contrario aparece la letra “A”, debe decir \
+rápidamente si dicha palabra le resulta positiva (agradable) o negativa (desagradable). \
+Una vez realice el juicio “S-sílaba” o “A-agradable/desagradable”, se presentará una nueva \
+palabra y así sucesivamente hasta completar la presentación de las 30 palabras"]
+
+const instrucciones2 = ["A continuación, se mostrarán una serie de palabras \
+sobre las que debe realizar 2 tipos de juicios discriminativos. \
+Si antes de la aparición de la palabra aparece la letra “S”, debe \
+decidir lo más rápidamente posible cuántas sílabas tiene la palabra \
+que se le muestra. Si por el contrario aparece la letra “A”, debe \
+decir rápidamente si dicha palabra le resulta positiva (agradable) \
+o negativa (desagradable). Una vez realice el juicio “S-sílaba” o \
+“A-agradable/desagradable”, se presentará una nueva palabra y así \
+sucesivamente hasta completar la presentación de las 30 palabras. \
+Asimismo, trate de prestar atención a cada una de las palabras, \
+ya que al final de la presentación realizará una prueba de memoria"]
+
 let palabras = [];
 let indice = 0;
 let resultados = [];
 
 function iniciar(n) {
   palabras = (n === 1 ? lista1 : lista2).slice();
+  instrucciones = (n === 1 ? instrucciones1 : instrucciones2);
   indice = 0;
   resultados = [];
   document.getElementById("inicio").style.display = "none";
-  mostrarPalabra();
+  mostrarInstrucciones();
+}
+
+function mostrarInstrucciones() {
+  const pantalla = document.getElementById("pantalla");
+
+  //Mostrar Instrucciones
+  pantalla.textContent = instrucciones;
+
+  const botonSiguiente = document.createElement("button");
+  botonSiguiente.textContent = "Siguiente";
+  botonSiguiente.style.fontSize = "24px";
+  botonSiguiente.style.padding = "10px 20px";
+  botonSiguiente.style.marginTop = "40px";
+  botonSiguiente.onclick = mostrarPalabra();
+
+  document.body.appendChild(botonDescarga);
 }
 
 function mostrarPalabra() {
