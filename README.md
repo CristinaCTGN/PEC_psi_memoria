@@ -4,7 +4,7 @@ Aplicaciones desarrolladas para realizar los tres experimentos de la PEC propues
 Versión: 0.0.1
 
 ## ¡IMPORTANTE!
-Éste proyecto está sujeto a Licencia, contenida en el fichero [LICENSE.md](LICENSE.md).
+Éste proyecto está sujeto a Licencia, contenida en el fichero [LICENSE.md](https://github.com/CristinaCTGN/PEC_psi_memoria/blob/main/LICENSE.md).
 
 Si se usa éste set de herramientas, según lo indicado en la licencia, se debe mencionar a la autora original. Ésto se hará de dos formas posibles:
 
