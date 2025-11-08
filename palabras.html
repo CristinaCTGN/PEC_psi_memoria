@@ -14,6 +14,14 @@ body {
   font-size: 60px;
   margin-top: 150px;
 }
+#pantalla.instrucciones {
+  font-size: 18px;
+  max-width: 800px;
+  margin: 50px auto;
+  text-align: left;
+  line-height: 1.5;
+  padding: 20px;
+}
 select, button {
   font-size: 22px;
   margin: 15px;
@@ -105,6 +113,7 @@ function mostrarInstrucciones() {
   const pantalla = document.getElementById("pantalla");
 
   //Mostrar Instrucciones
+  pantalla.className = "instrucciones";
   pantalla.textContent = instrucciones;
 
   const botonSiguiente = document.createElement("button");
@@ -112,9 +121,13 @@ function mostrarInstrucciones() {
   botonSiguiente.style.fontSize = "24px";
   botonSiguiente.style.padding = "10px 20px";
   botonSiguiente.style.marginTop = "40px";
-  botonSiguiente.onclick = mostrarPalabra();
+  botonSiguiente.onclick = () => {
+    pantalla.className = "";
+    botonSiguiente.remove();
+    mostrarPalabra();
+  };
 
-  document.body.appendChild(botonDescarga);
+  document.body.appendChild(botonSiguiente);
 }
 
 function mostrarPalabra() {
