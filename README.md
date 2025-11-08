@@ -1,6 +1,8 @@
 # Aplicaciones para la Realización de la PEC de Psicología de la Memoria
 Aplicaciones desarrolladas para realizar los tres experimentos de la PEC propuesta en el curso 2025-26 en la asignatura Psicología de la Memoria, del 2º curso del Grado de Psicología en la UNED.
 
+Versión: 0.0.1
+
 ## ¡IMPORTANTE!
 Éste proyecto está sujeto a Licencia, contenida en el fichero [LICENSE.md](LICENSE.md).
 
